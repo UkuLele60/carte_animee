@@ -131,36 +131,17 @@ fetch('data/ouidah.geojson')
         `Nombre de captifs : ${total.toLocaleString('fr-FR')}`
       );
 
-      // 3.2 Ligne ou ligne animée (flux) entre Ouidah et ce port
+      // 3.2 Ligne (flux) entre Ouidah et ce port (SANS ANIMATION POUR L'INSTANT)
       const latLngs = [ouidahLatLng, latLng];
 
       // Épaisseur de la ligne : proportionnelle au nombre de captifs
       const weight = 1 + 4 * (Math.sqrt(total) / Math.sqrt(maxValue)); // entre ~1 et 5
 
-      let path;
-
-      // Si le plugin antPath est bien chargé et dispo
-      if (L.polyline && L.polyline.antPath) {
-        path = L.polyline.antPath(latLngs, {
-          delay: 800,                // vitesse de l'animation
-          dashArray: [10, 20],       // motif en pointillés
-          weight: weight,
-          color: '#0000ff',
-          pulseColor: '#ffffff',
-          paused: false,
-          reverse: false,
-          hardwareAccelerated: true
-        });
-      } else {
-        // Fallback : simple polyline sans animation
-        path = L.polyline(latLngs, {
-          weight: weight,
-          color: '#0000ff',
-          opacity: 0.6
-        });
-      }
-
-      path.addTo(map);
+      const path = L.polyline(latLngs, {
+        weight: weight,
+        color: '#0000ff',
+        opacity: 0.6
+      }).addTo(map);
 
       path.bindPopup(
         `Nombre de captifs : ${total.toLocaleString('fr-FR')}`
