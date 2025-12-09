@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Destination des captifs depuis Ouidah</title>
+
+  <!-- Feuille de style Leaflet -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+
+  <!-- Ta feuille de style -->
+  <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+  <!-- Conteneur de la carte -->
+  <div id="map"></div>
+
+  <!-- Bloc pour les liens de téléchargement -->
+  <div id="downloads">
+    <h2>Télécharger les données</h2>
+    <ul>
+      <li><a href="data/ouidah.geojson" download>Ouidah (GeoJSON)</a></li>
+      <li><a href="data/disembarkations_america.geojson" download>Ports de débarquement (GeoJSON)</a></li>
+    </ul>
+  </div>
+
+  <!-- Scripts Leaflet -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+  </script>
+
+  <!-- Plugin pour les lignes animées (leaflet-ant-path) -->
+  <script src="https://unpkg.com/leaflet-ant-path/dist/leaflet-ant-path.min.js"></script>
+
+  <!-- Ton script -->
+  <script src="script.js"></script>
+
+</body>
+</html>

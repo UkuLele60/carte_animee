@@ -1,0 +1,43 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* La carte prend toute la hauteur de la fenêtre */
+#map {
+  width: 100%;
+  height: 80vh; /* 80% de la hauteur de la fenêtre */
+}
+
+/* Bloc de téléchargement sous la carte */
+#downloads {
+  padding: 1rem;
+  background: #f7f7f7;
+  border-top: 1px solid #ddd;
+}
+
+#downloads h2 {
+  margin-top: 0;
+  font-size: 1rem;
+}
+
+#downloads ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0.5rem 0 0 0;
+}
+
+#downloads li {
+  margin-bottom: 0.25rem;
+}
+
+#downloads a {
+  color: #0066cc;
+  text-decoration: none;
+}
+
+#downloads a:hover {
+  text-decoration: underline;
+}
