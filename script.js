@@ -17,9 +17,9 @@ function createSizeScale(maxValue, minRadius = 4, maxRadius = 25) {
 const map = L.map("map");
 
 // Fond de carte
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
   maxZoom: 10,
-  attribution: "&copy; OpenStreetMap contributors",
+  attribution: '&copy; CartoDB &copy; OpenStreetMap contributors'
 }).addTo(map);
 
 // Échelle cartographique
@@ -338,3 +338,4 @@ fetch("data/ouidah.geojson")
   .catch((err) => {
     console.error("Erreur lors du chargement des données :", err);
   });
+
