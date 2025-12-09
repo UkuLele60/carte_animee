@@ -85,7 +85,7 @@ function drawDetailed() {
     const latLng = [coords[1], coords[0]];
     const name = props.Principa_1 || 'Port inconnu';
 
-    // Cercle proportionnel (orange)
+    // Cercle proportionnel (orange clair)
     const radius = sizeScale(total);
 
     const portMarker = L.circleMarker(latLng, {
@@ -169,17 +169,16 @@ function drawClustered(clusterCount) {
         .filter(Boolean)
     ));
 
-    // Symbole proportionnel pour le regroupement (on garde le vert pour bien distinguer)
+    // Symbole proportionnel pour le regroupement (orange plus foncé)
     const radius = sizeScale(total);
 
     const marker = L.circleMarker(latLng, {
-  radius: radius,
-  fillColor: '#d97a00',   // orange foncé
-  color: '#995700',       // contour orangé foncé
-  weight: 1,
-  fillOpacity: 0.85
-});
-
+      radius: radius,
+      fillColor: '#d97a00',   // orange foncé
+      color: '#995700',       // contour orangé foncé
+      weight: 1,
+      fillOpacity: 0.85
+    }).addTo(portsLayer);
 
     // Popup des ports agrégés
     marker.bindPopup(
