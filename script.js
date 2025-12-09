@@ -1,6 +1,6 @@
 // Fonction utilitaire pour créer une échelle de taille de symboles
 function createSizeScale(maxValue, minRadius = 4, maxRadius = 25) {
-  const maxRoot = Math.sqrt(maxValue);
+  const maxRoot = Math.sqrt(maxValue || 1);
 
   return function(value) {
     if (!value || value <= 0) return minRadius;
@@ -26,6 +26,9 @@ L.control.scale().addTo(map);
 let ouidahFeature = null;
 let ouidahLatLng = null;
 
+// Pour ajuster l’emprise de la carte
+const bounds = L.latLngBounds();
+
 // 1. Charger Ouidah
 fetch('data/ouidah.geojson')
   .then(response => response.json())
@@ -38,7 +41,7 @@ fetch('data/ouidah.geojson')
     // On suppose qu’il n’y a qu’un point pour Ouidah
     ouidahFeature = data.features[0];
 
-    const coords = ouidahFeature.geometry.coordinates; // [lon, lat]
+    const coords = ouidahFeature.geometry.coordinates; // [lon, lat, ...]
     ouidahLatLng = [coords[1], coords[0]];
 
     // On force des propriétés cohérentes
@@ -49,8 +52,7 @@ fetch('data/ouidah.geojson')
     // On fixe le nombre de captifs à 1 300 000
     ouidahFeature.properties.total_disembarked = 1300000;
 
-    // On centre la carte sur Ouidah
-    map.setView(ouidahLatLng, 3);
+    bounds.extend(ouidahLatLng);
 
     // Puis on charge les ports de débarquement
     return fetch('data/disembarkations_america.geojson');
@@ -98,7 +100,7 @@ fetch('data/ouidah.geojson')
       `Nombre de captifs : ${ouidahFeature.properties.total_disembarked.toLocaleString('fr-FR')}`
     );
 
-    // 3. Ajouter les ports de débarquement + flux animés vers eux
+    // 3. Ajouter les ports de débarquement + flux vers eux
     features.forEach(f => {
       if (!f.geometry || f.geometry.type !== 'Point') return;
 
@@ -106,10 +108,12 @@ fetch('data/ouidah.geojson')
       const total = Number(props.total_disembarked);
       if (isNaN(total)) return;
 
-      const coords = f.geometry.coordinates; // [lon, lat]
+      const coords = f.geometry.coordinates; // [lon, lat, ...]
       const latLng = [coords[1], coords[0]];
 
       const name = props.Principa_1 || 'Port inconnu';
+
+      bounds.extend(latLng);
 
       // 3.1 Cercle proportionnel pour le port
       const radius = sizeScale(total);
@@ -127,27 +131,44 @@ fetch('data/ouidah.geojson')
         `Nombre de captifs : ${total.toLocaleString('fr-FR')}`
       );
 
-      // 3.2 Ligne animée (flux) entre Ouidah et ce port
+      // 3.2 Ligne ou ligne animée (flux) entre Ouidah et ce port
       const latLngs = [ouidahLatLng, latLng];
 
       // Épaisseur de la ligne : proportionnelle au nombre de captifs
       const weight = 1 + 4 * (Math.sqrt(total) / Math.sqrt(maxValue)); // entre ~1 et 5
 
-      const path = L.polyline.antPath(latLngs, {
-        delay: 800,                // vitesse de l'animation
-        dashArray: [10, 20],       // motif en pointillés
-        weight: weight,
-        color: '#0000ff',
-        pulseColor: '#ffffff',
-        paused: false,
-        reverse: false,
-        hardwareAccelerated: true
-      }).addTo(map);
+      let path;
+
+      // Si le plugin antPath est bien chargé et dispo
+      if (L.polyline && L.polyline.antPath) {
+        path = L.polyline.antPath(latLngs, {
+          delay: 800,                // vitesse de l'animation
+          dashArray: [10, 20],       // motif en pointillés
+          weight: weight,
+          color: '#0000ff',
+          pulseColor: '#ffffff',
+          paused: false,
+          reverse: false,
+          hardwareAccelerated: true
+        });
+      } else {
+        // Fallback : simple polyline sans animation
+        path = L.polyline(latLngs, {
+          weight: weight,
+          color: '#0000ff',
+          opacity: 0.6
+        });
+      }
+
+      path.addTo(map);
 
       path.bindPopup(
         `Nombre de captifs : ${total.toLocaleString('fr-FR')}`
       );
     });
+
+    // Ajuster la vue pour englober Ouidah + tous les ports
+    map.fitBounds(bounds, { padding: [20, 20] });
 
   })
   .catch(err => {
