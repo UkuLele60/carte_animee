@@ -2,44 +2,113 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #f5f5f5;
 }
 
-/* La carte prend toute la hauteur de la fenêtre */
 #map {
   width: 100%;
-  height: 80vh; /* 80% de la hauteur de la fenêtre */
+  height: calc(100vh - 40px); /* laisse un peu de place au bandeau crédits */
+  background: #ffffff;
 }
 
-/* Bloc de téléchargement sous la carte */
-#downloads {
-  padding: 1rem;
-  background: #f7f7f7;
-  border-top: 1px solid #ddd;
+/* -------- Panneau latéral "Télécharger les données" -------- */
+
+#download-panel {
+  position: fixed;
+  right: 1rem;
+  top: 4rem;
+  z-index: 1000;
+  font-family: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
-#downloads h2 {
-  margin-top: 0;
-  font-size: 1rem;
+/* Bouton "Télécharger les données" */
+#download-toggle {
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  background: #fcd116;              /* jaune du Bénin */
+  color: #2b2b2b;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+  transition: background 0.12s ease, box-shadow 0.12s ease, transform 0.08s ease;
+  border: 1px solid rgba(0,0,0,0.06);
 }
 
-#downloads ul {
+#download-toggle:hover {
+  background: #ffe46b;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.25);
+  transform: translateY(-1px);
+}
+
+/* Contenu déroulant */
+#download-content {
+  margin-top: 0.4rem;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 0.6rem 0.8rem;
+  border-top: 3px solid #008751;     /* vert du Bénin */
+  box-shadow: 0 6px 18px rgba(0,0,0,0.16);
+  min-width: 220px;
+}
+
+/* États ouvert / fermé */
+#download-panel.collapsed #download-content {
+  display: none;
+}
+
+#download-panel.open #download-content {
+  display: block;
+}
+
+/* Typo interne */
+#download-content .download-title {
+  margin: 0 0 0.35rem 0;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  color: #008751;
+  font-family: "Poppins", sans-serif;
+}
+
+#download-content ul {
   list-style: none;
-  padding-left: 0;
-  margin: 0.5rem 0 0 0;
+  padding: 0;
+  margin: 0;
 }
 
-#downloads li {
+#download-content li {
   margin-bottom: 0.25rem;
 }
 
-#downloads a {
-  color: #0066cc;
+#download-content a {
+  font-size: 0.8rem;
+  color: #1f4e79;
   text-decoration: none;
 }
 
-#downloads a:hover {
+#download-content a:hover {
   text-decoration: underline;
+}
+
+/* -------- Bandeau de crédits en bas de page -------- */
+
+#credits {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.25rem 1rem;
+  font-size: 0.75rem;
+  color: #555;
+  background: linear-gradient(90deg, rgba(0,135,81,0.05), rgba(252,209,22,0.06));
+  border-top: 1px solid rgba(0,0,0,0.05);
+  text-align: center;
+  font-family: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 /* Animation des lignes de flux */
@@ -57,4 +126,5 @@ html, body {
     stroke-dashoffset: -60;
   }
 }
+
 
