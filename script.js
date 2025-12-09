@@ -4,7 +4,7 @@
 function createSizeScale(maxValue, minRadius = 4, maxRadius = 25) {
   const maxRoot = Math.sqrt(maxValue || 1);
 
-  return function(value) {
+  return function (value) {
     if (!value || value <= 0) return minRadius;
     const root = Math.sqrt(value);
     const ratio = root / maxRoot;
@@ -14,12 +14,12 @@ function createSizeScale(maxValue, minRadius = 4, maxRadius = 25) {
 
 // ------------ Variables globales ------------
 
-const map = L.map('map');
+const map = L.map("map");
 
 // Fond de carte
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 10,
-  attribution: '&copy; OpenStreetMap contributors'
+  attribution: "&copy; OpenStreetMap contributors",
 }).addTo(map);
 
 // Échelle cartographique
@@ -34,7 +34,7 @@ let ouidahFeature = null;
 let ouidahLatLng = null;
 let ouidahMarker = null;
 
-let portsFeatures = [];  // toutes les features des ports de débarquement
+let portsFeatures = []; // toutes les features des ports de débarquement
 
 // Échelles globales
 let maxValue = 0;
@@ -50,7 +50,7 @@ const bounds = L.latLngBounds();
 
 function initScales(values) {
   maxValue = Math.max(...values);
-  minPositive = Math.min(...values.filter(v => v > 0));
+  minPositive = Math.min(...values.filter((v) => v > 0));
 
   sizeScale = createSizeScale(maxValue);
 
@@ -74,8 +74,8 @@ function drawDetailed() {
   portsLayer.clearLayers();
   flowsLayer.clearLayers();
 
-  portsFeatures.forEach(f => {
-    if (!f.geometry || f.geometry.type !== 'Point') return;
+  portsFeatures.forEach((f) => {
+    if (!f.geometry || f.geometry.type !== "Point") return;
 
     const props = f.properties || {};
     const total = Number(props.total_disembarked);
@@ -83,23 +83,25 @@ function drawDetailed() {
 
     const coords = f.geometry.coordinates; // [lon, lat, ...]
     const latLng = [coords[1], coords[0]];
-    const name = props.Principa_1 || 'Port inconnu';
+    const name = props.Principa_1 || "Port inconnu";
 
     // Cercle proportionnel (orange clair)
     const radius = sizeScale(total);
 
     const portMarker = L.circleMarker(latLng, {
       radius: radius,
-      fillColor: '#ff8c00',   // orange
-      color: '#cc7000',
+      fillColor: "#ff8c00", // orange clair
+      color: "#cc7000",
       weight: 1,
-      fillOpacity: 0.8
+      fillOpacity: 0.8,
     }).addTo(portsLayer);
 
     // Popup "normale" pour port non agrégé
     portMarker.bindPopup(
       `<strong>${name}</strong><br>` +
-      `${total.toLocaleString('fr-FR')} captifs ont été débarqués ici.`
+        `${total.toLocaleString(
+          "fr-FR"
+        )} captifs ont été débarqués ici.`
     );
 
     // Flux Ouidah → port (violet)
@@ -108,14 +110,16 @@ function drawDetailed() {
 
     const path = L.polyline(latLngs, {
       weight: weight,
-      color: '#7b3294', // violet
+      color: "#7b3294", // violet
       opacity: 0.8,
-      className: 'flow-line'
+      className: "flow-line",
     }).addTo(flowsLayer);
 
     // Popup flux détaillé
     path.bindPopup(
-      `${total.toLocaleString('fr-FR')} captifs déportés vers ${name}.`
+      `${total.toLocaleString(
+        "fr-FR"
+      )} captifs déportés vers ${name}.`
     );
   });
 }
@@ -127,16 +131,18 @@ function drawClustered(clusterCount) {
 
   // Construire un FeatureCollection Turf
   const fc = {
-    type: 'FeatureCollection',
-    features: portsFeatures
+    type: "FeatureCollection",
+    features: portsFeatures,
   };
 
   // Clustering par K-means
-  const clustered = turf.clustersKmeans(fc, { numberOfClusters: clusterCount });
+  const clustered = turf.clustersKmeans(fc, {
+    numberOfClusters: clusterCount,
+  });
 
   // Regrouper par identifiant de cluster
   const clusters = {}; // id -> {features:[], total: number}
-  clustered.features.forEach(f => {
+  clustered.features.forEach((f) => {
     const cid = f.properties.cluster;
     if (!clusters[cid]) {
       clusters[cid] = { features: [], total: 0 };
@@ -147,10 +153,10 @@ function drawClustered(clusterCount) {
   });
 
   // Pour chaque cluster, on crée un point (centroïde) + un flux agrégé
-  Object.values(clusters).forEach(cluster => {
+  Object.values(clusters).forEach((cluster) => {
     const clusterFc = {
-      type: 'FeatureCollection',
-      features: cluster.features
+      type: "FeatureCollection",
+      features: cluster.features,
     };
 
     // Centroïde géographique du cluster
@@ -163,27 +169,31 @@ function drawClustered(clusterCount) {
     const nbPorts = cluster.features.length;
 
     // Liste des noms de ports pour la popup de flux
-    const portNames = Array.from(new Set(
-      cluster.features
-        .map(f => f.properties && f.properties.Principa_1)
-        .filter(Boolean)
-    ));
+    const portNames = Array.from(
+      new Set(
+        cluster.features
+          .map((f) => f.properties && f.properties.Principa_1)
+          .filter(Boolean)
+      )
+    );
 
     // Symbole proportionnel pour le regroupement (orange plus foncé)
     const radius = sizeScale(total);
 
     const marker = L.circleMarker(latLng, {
       radius: radius,
-      fillColor: '#d97a00',   // orange foncé
-      color: '#995700',       // contour orangé foncé
+      fillColor: "#d97a00", // orange foncé
+      color: "#995700", // contour orangé foncé
       weight: 1,
-      fillOpacity: 0.85
+      fillOpacity: 0.85,
     }).addTo(portsLayer);
 
     // Popup des ports agrégés
     marker.bindPopup(
       `<strong>Regroupement de ${nbPorts} ports</strong><br>` +
-      `${total.toLocaleString('fr-FR')} captifs ont été débarqués ici.`
+        `${total.toLocaleString(
+          "fr-FR"
+        )} captifs ont été débarqués ici.`
     );
 
     // Flux Ouidah → centroïde du cluster (violet foncé)
@@ -192,46 +202,46 @@ function drawClustered(clusterCount) {
 
     const path = L.polyline(latLngs, {
       weight: weight,
-      color: '#542788', // violet plus sombre
+      color: "#542788", // violet plus sombre
       opacity: 0.9,
-      className: 'flow-line'
+      className: "flow-line",
     }).addTo(flowsLayer);
 
     // Contenu de la popup du flux agrégé
-    let listHtml = '';
+    let listHtml = "";
     if (portNames.length > 0) {
       listHtml =
-        '<ul>' +
-        portNames
-          .map(n => `<li>${n}</li>`)
-          .join('') +
-        '</ul>';
+        "<ul>" +
+        portNames.map((n) => `<li>${n}</li>`).join("") +
+        "</ul>";
     }
 
     path.bindPopup(
-      `${total.toLocaleString('fr-FR')} captifs déportés vers :<br>` +
-      listHtml
+      `${total.toLocaleString(
+        "fr-FR"
+      )} captifs déportés vers :<br>` + listHtml
     );
   });
 }
 
 // Choix du mode selon le niveau de zoom
 function updateMapForZoom(z) {
-  if (z >= 6) {
+  // On met la vue détaillée plus souvent : à partir de zoom 5
+  if (z >= 5) {
     drawDetailed();
-  } else if (z >= 4) {
+  } else if (z >= 3) {
     drawClustered(20); // zoom intermédiaire : 20 regroupements
   } else {
-    drawClustered(5);  // zoom très éloigné : 5 grands regroupements
+    drawClustered(5); // zoom très éloigné : 5 grands regroupements
   }
 }
 
 // ------------ Chargement des données ------------
 
 // 1. Charger Ouidah
-fetch('data/ouidah.geojson')
-  .then(response => response.json())
-  .then(data => {
+fetch("data/ouidah.geojson")
+  .then((response) => response.json())
+  .then((data) => {
     if (!data.features || data.features.length === 0) {
       console.error("Pas de feature dans ouidah.geojson");
       return;
@@ -255,29 +265,31 @@ fetch('data/ouidah.geojson')
     // Placer Ouidah (point proportionnel)
     ouidahMarker = L.circleMarker(ouidahLatLng, {
       radius: 10, // sera réajusté après
-      fillColor: '#800026',
-      color: '#400013',
+      fillColor: "#800026",
+      color: "#400013",
       weight: 1,
-      fillOpacity: 0.8
+      fillOpacity: 0.8,
     }).addTo(map);
 
     // Popup de Ouidah
     ouidahMarker.bindPopup(
       `<strong>Port de Ouidah</strong><br>` +
-      `Nombre total de captifs : ${ouidahFeature.properties.total_disembarked.toLocaleString('fr-FR')}`
+        `Nombre total de captifs : ${ouidahFeature.properties.total_disembarked.toLocaleString(
+          "fr-FR"
+        )}`
     );
 
     // Centrer grossièrement pour commencer
     map.setView(ouidahLatLng, 3);
 
     // Puis on charge les ports de débarquement
-    return fetch('data/disembarkations_america.geojson');
+    return fetch("data/disembarkations_america.geojson");
   })
-  .then(response => {
+  .then((response) => {
     if (!response) return;
     return response.json();
   })
-  .then(portsData => {
+  .then((portsData) => {
     if (!portsData) return;
 
     const features = portsData.features || [];
@@ -291,8 +303,8 @@ fetch('data/ouidah.geojson')
 
     // Récupérer les valeurs de total_disembarked pour les échelles
     const values = features
-      .map(f => Number(f.properties && f.properties.total_disembarked))
-      .filter(v => !isNaN(v) && v > 0);
+      .map((f) => Number(f.properties && f.properties.total_disembarked))
+      .filter((v) => !isNaN(v) && v > 0);
 
     // Inclure aussi Ouidah (1 300 000)
     values.push(ouidahFeature.properties.total_disembarked);
@@ -300,12 +312,14 @@ fetch('data/ouidah.geojson')
     initScales(values);
 
     // Ajuster le rayon d’Ouidah selon la même échelle que les ports
-    const ouidahRadius = sizeScale(ouidahFeature.properties.total_disembarked);
+    const ouidahRadius = sizeScale(
+      ouidahFeature.properties.total_disembarked
+    );
     ouidahMarker.setRadius(ouidahRadius);
 
     // Étendre les bornes à tous les ports
-    portsFeatures.forEach(f => {
-      if (!f.geometry || f.geometry.type !== 'Point') return;
+    portsFeatures.forEach((f) => {
+      if (!f.geometry || f.geometry.type !== "Point") return;
       const c = f.geometry.coordinates;
       bounds.extend([c[1], c[0]]);
     });
@@ -317,11 +331,10 @@ fetch('data/ouidah.geojson')
     updateMapForZoom(map.getZoom());
 
     // Mettre à jour à chaque zoom
-    map.on('zoomend', () => {
+    map.on("zoomend", () => {
       updateMapForZoom(map.getZoom());
     });
-
   })
-  .catch(err => {
+  .catch((err) => {
     console.error("Erreur lors du chargement des données :", err);
   });
