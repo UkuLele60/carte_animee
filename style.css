@@ -41,3 +41,20 @@ html, body {
 #downloads a:hover {
   text-decoration: underline;
 }
+
+/* Animation des lignes de flux */
+.flow-line {
+  stroke-dasharray: 10 20;
+  animation: flow-dash 2.5s linear infinite;
+}
+
+/* Animation type "fourmis" qui se déplacent le long de la ligne */
+@keyframes flow-dash {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -60;
+  }
+}
+
