@@ -85,35 +85,37 @@ function drawDetailed() {
     const latLng = [coords[1], coords[0]];
     const name = props.Principa_1 || 'Port inconnu';
 
-    // Cercle proportionnel
+    // Cercle proportionnel (orange)
     const radius = sizeScale(total);
 
     const portMarker = L.circleMarker(latLng, {
       radius: radius,
-      fillColor: '#1f78b4',
-      color: '#084d74',
+      fillColor: '#ff8c00',   // orange
+      color: '#cc7000',
       weight: 1,
       fillOpacity: 0.8
     }).addTo(portsLayer);
 
+    // Popup "normale" pour port non agrégé
     portMarker.bindPopup(
-      `<strong>Port de ${name}</strong><br>` +
-      `Nombre de captifs : ${total.toLocaleString('fr-FR')}`
+      `<strong>${name}</strong><br>` +
+      `${total.toLocaleString('fr-FR')} captifs ont été débarqués ici.`
     );
 
-    // Flux Ouidah → port
+    // Flux Ouidah → port (violet)
     const latLngs = [ouidahLatLng, latLng];
     const weight = lineWidthFromTotal(total);
 
     const path = L.polyline(latLngs, {
       weight: weight,
-      color: '#0000ff',
-      opacity: 0.7,
+      color: '#7b3294', // violet
+      opacity: 0.8,
       className: 'flow-line'
     }).addTo(flowsLayer);
 
+    // Popup flux détaillé
     path.bindPopup(
-      `Nombre de captifs : ${total.toLocaleString('fr-FR')}`
+      `${total.toLocaleString('fr-FR')} captifs déportés vers ${name}.`
     );
   });
 }
@@ -160,35 +162,56 @@ function drawClustered(clusterCount) {
     // Nombre de ports dans le cluster
     const nbPorts = cluster.features.length;
 
-    // Symbole proportionnel
+    // Liste des noms de ports pour la popup de flux
+    const portNames = Array.from(new Set(
+      cluster.features
+        .map(f => f.properties && f.properties.Principa_1)
+        .filter(Boolean)
+    ));
+
+    // Symbole proportionnel pour le regroupement (on garde le vert pour bien distinguer)
     const radius = sizeScale(total);
 
     const marker = L.circleMarker(latLng, {
-      radius: radius,
-      fillColor: '#41ab5d',
-      color: '#238443',
-      weight: 1,
-      fillOpacity: 0.8
-    }).addTo(portsLayer);
+  radius: radius,
+  fillColor: '#d97a00',   // orange foncé
+  color: '#995700',       // contour orangé foncé
+  weight: 1,
+  fillOpacity: 0.85
+});
 
+
+    // Popup des ports agrégés
     marker.bindPopup(
-      `<strong>Cluster de ${nbPorts} ports</strong><br>` +
-      `Nombre total de captifs : ${total.toLocaleString('fr-FR')}`
+      `<strong>Regroupement de ${nbPorts} ports</strong><br>` +
+      `${total.toLocaleString('fr-FR')} captifs ont été débarqués ici.`
     );
 
-    // Flux Ouidah → centroïde du cluster
+    // Flux Ouidah → centroïde du cluster (violet foncé)
     const latLngs = [ouidahLatLng, latLng];
     const weight = lineWidthFromTotal(total);
 
     const path = L.polyline(latLngs, {
       weight: weight,
-      color: '#00441b',
-      opacity: 0.8,
+      color: '#542788', // violet plus sombre
+      opacity: 0.9,
       className: 'flow-line'
     }).addTo(flowsLayer);
 
+    // Contenu de la popup du flux agrégé
+    let listHtml = '';
+    if (portNames.length > 0) {
+      listHtml =
+        '<ul>' +
+        portNames
+          .map(n => `<li>${n}</li>`)
+          .join('') +
+        '</ul>';
+    }
+
     path.bindPopup(
-      `Nombre total de captifs : ${total.toLocaleString('fr-FR')}`
+      `${total.toLocaleString('fr-FR')} captifs déportés vers :<br>` +
+      listHtml
     );
   });
 }
@@ -198,9 +221,9 @@ function updateMapForZoom(z) {
   if (z >= 6) {
     drawDetailed();
   } else if (z >= 4) {
-    drawClustered(20); // zoom intermédiaire : 20 clusters
+    drawClustered(20); // zoom intermédiaire : 20 regroupements
   } else {
-    drawClustered(5);  // zoom très éloigné : 5 grands clusters
+    drawClustered(5);  // zoom très éloigné : 5 grands regroupements
   }
 }
 
@@ -231,7 +254,6 @@ fetch('data/ouidah.geojson')
     bounds.extend(ouidahLatLng);
 
     // Placer Ouidah (point proportionnel)
-    const ouidahRadius = 0; // temporaire, on calculera après les échelles
     ouidahMarker = L.circleMarker(ouidahLatLng, {
       radius: 10, // sera réajusté après
       fillColor: '#800026',
@@ -240,9 +262,10 @@ fetch('data/ouidah.geojson')
       fillOpacity: 0.8
     }).addTo(map);
 
+    // Popup de Ouidah
     ouidahMarker.bindPopup(
-      `<strong>Port de ${ouidahFeature.properties.Principa_1}</strong><br>` +
-      `Nombre de captifs : ${ouidahFeature.properties.total_disembarked.toLocaleString('fr-FR')}`
+      `<strong>Port de Ouidah</strong><br>` +
+      `Nombre total de captifs : ${ouidahFeature.properties.total_disembarked.toLocaleString('fr-FR')}`
     );
 
     // Centrer grossièrement pour commencer
