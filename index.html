@@ -26,13 +26,21 @@
   <div id="map"></div>
 
   <!-- Bloc pour les liens de téléchargement -->
-  <div id="downloads">
-    <h2>Télécharger les données</h2>
+  <div id="map"></div>
+
+<!-- Panneau latéral pour le téléchargement des données -->
+<div id="download-panel" class="collapsed">
+  <button id="download-toggle" type="button">
+    Télécharger les données
+  </button>
+  <div id="download-content">
+    <p class="download-title">Jeux de données</p>
     <ul>
       <li><a href="data/ouidah.geojson" download>Ouidah (GeoJSON)</a></li>
       <li><a href="data/disembarkations_america.geojson" download>Ports de débarquement (GeoJSON)</a></li>
     </ul>
   </div>
+</div>
 
   <!-- Scripts Leaflet -->
   <script
@@ -48,7 +56,25 @@
   <!-- Ton script -->
   <script src="script.js"></script>
 
+<script>
+  // Toggle du panneau de téléchargement
+  const dlPanel = document.getElementById('download-panel');
+  const dlToggle = document.getElementById('download-toggle');
+
+  if (dlPanel && dlToggle) {
+    dlToggle.addEventListener('click', () => {
+      dlPanel.classList.toggle('collapsed');
+      dlPanel.classList.toggle('open');
+    });
+  }
+</script>
+  
+  <footer id="credits">
+  Source : BD SlaveVoyage, 2025 – Réalisation : S. Gnansounou &amp; L. Grillon, 2025
+</footer>
+
 </body>
 </html>
+
 
 
