@@ -1,4 +1,4 @@
-// Fonction utilitaire pour créer une échelle de taille de symboles
+// Fonction utilitaire pour créer une échelle de taille de symboles (pour les points)
 function createSizeScale(maxValue, minRadius = 4, maxRadius = 25) {
   const maxRoot = Math.sqrt(maxValue || 1);
 
@@ -71,7 +71,7 @@ fetch('data/ouidah.geojson')
       return;
     }
 
-    // On récupère les valeurs de total_disembarked pour calculer l’échelle
+    // On récupère les valeurs de total_disembarked pour calculer les échelles
     const values = features
       .map(f => Number(f.properties && f.properties.total_disembarked))
       .filter(v => !isNaN(v) && v > 0);
@@ -80,9 +80,24 @@ fetch('data/ouidah.geojson')
     values.push(ouidahFeature.properties.total_disembarked);
 
     const maxValue = Math.max(...values);
+    const minPositive = Math.min(...values.filter(v => v > 0));
 
-    // Fonction qui convertit nb de captifs -> rayon de cercle
+    // Pour les points : taille proportionnelle via racine carrée
     const sizeScale = createSizeScale(maxValue);
+
+    // Pour les lignes : épaisseur sur une échelle logarithmique
+    const minLog = Math.log10(minPositive);
+    const maxLog = Math.log10(maxValue);
+
+    function lineWidthFromTotal(total) {
+      if (!total || total <= 0) return 1;
+      const tLog = Math.log10(total);
+      const ratio = (tLog - minLog) / (maxLog - minLog);
+      // On borne le ratio entre 0 et 1 pour éviter les surprises
+      const r = Math.max(0, Math.min(1, ratio));
+      // Épaisseur entre 1 et 10 px
+      return 1 + r * 9;
+    }
 
     // 2. Ajouter le point de Ouidah (symbole proportionnel)
     const ouidahRadius = sizeScale(ouidahFeature.properties.total_disembarked);
@@ -131,16 +146,16 @@ fetch('data/ouidah.geojson')
         `Nombre de captifs : ${total.toLocaleString('fr-FR')}`
       );
 
-      // 3.2 Ligne (flux) entre Ouidah et ce port (SANS ANIMATION POUR L'INSTANT)
+      // 3.2 Ligne animée (flux) entre Ouidah et ce port
       const latLngs = [ouidahLatLng, latLng];
 
-      // Épaisseur de la ligne : proportionnelle au nombre de captifs
-      const weight = 1 + 4 * (Math.sqrt(total) / Math.sqrt(maxValue)); // entre ~1 et 5
+      const weight = lineWidthFromTotal(total);
 
       const path = L.polyline(latLngs, {
         weight: weight,
         color: '#0000ff',
-        opacity: 0.6
+        opacity: 0.8,
+        className: 'flow-line'  // très important pour l’animation CSS
       }).addTo(map);
 
       path.bindPopup(
