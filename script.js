@@ -262,14 +262,18 @@ fetch("data/ouidah.geojson")
 
     bounds.extend(ouidahLatLng);
 
-    // Placer Ouidah (point proportionnel)
-    ouidahMarker = L.circleMarker(ouidahLatLng, {
-      radius: 10, // sera réajusté après
-      fillColor: "#800026",
-      color: "#400013",
-      weight: 1,
-      fillOpacity: 0.8,
-    }).addTo(map);
+    // Icône personnalisée pour Ouidah
+const ouidahIcon = L.icon({
+  iconUrl: 'img/bateau.svg', // Chemin vers ton SVG
+  iconSize: [40, 40],        // Taille de l'icône (à ajuster)
+  iconAnchor: [20, 20],      // Point de l'icône qui correspond à la position sur la carte
+  popupAnchor: [0, -20]      // Position du popup par rapport à l'icône
+});
+
+// Placer le marqueur Ouidah avec l'icône bateau
+ouidahMarker = L.marker(ouidahLatLng, {
+  icon: ouidahIcon
+}).addTo(map);
 
     // Popup de Ouidah
     ouidahMarker.bindPopup(
@@ -338,4 +342,5 @@ fetch("data/ouidah.geojson")
   .catch((err) => {
     console.error("Erreur lors du chargement des données :", err);
   });
+
 
