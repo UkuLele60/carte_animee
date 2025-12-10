@@ -265,8 +265,8 @@ fetch("data/ouidah.geojson")
     // Icône personnalisée pour Ouidah
 const ouidahIcon = L.icon({
   iconUrl: 'img/bateau.svg', // Chemin vers ton SVG
-  iconSize: [40, 40],        // Taille de l'icône (à ajuster)
-  iconAnchor: [20, 20],      // Point de l'icône qui correspond à la position sur la carte
+  iconSize: [60, 60],        // Taille de l'icône (à ajuster)
+  iconAnchor: [28, 12],      // Point de l'icône qui correspond à la position sur la carte
   popupAnchor: [0, -20]      // Position du popup par rapport à l'icône
 });
 
@@ -342,6 +342,7 @@ ouidahMarker = L.marker(ouidahLatLng, {
   .catch((err) => {
     console.error("Erreur lors du chargement des données :", err);
   });
+
 
 
 
