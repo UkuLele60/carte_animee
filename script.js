@@ -319,7 +319,7 @@ ouidahMarker = L.marker(ouidahLatLng, {
     const ouidahRadius = sizeScale(
       ouidahFeature.properties.total_disembarked
     );
-    ouidahMarker.setRadius(ouidahRadius);
+    //ouidahMarker.setRadius(ouidahRadius);
 
     // Étendre les bornes à tous les ports
     portsFeatures.forEach((f) => {
@@ -342,5 +342,6 @@ ouidahMarker = L.marker(ouidahLatLng, {
   .catch((err) => {
     console.error("Erreur lors du chargement des données :", err);
   });
+
 
 
