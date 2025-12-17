@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>YouTube embed test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+
+  <h1>Test vidéo YouTube</h1>
+
+  <iframe
+    width="560"
+    height="315"
+    src="https://www.youtube.com/embed/bT0SkC2TVb0"
+    title="Lecteur vidéo YouTube"
+    frameborder="0"
+    allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen>
+  </iframe>
+
+</body>
+</html>
